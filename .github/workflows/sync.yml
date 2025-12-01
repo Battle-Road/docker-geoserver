@@ -2,7 +2,7 @@ name: Sync kartoza/docker-geoserver
 
 on:
   schedule: 
-    interval: daily
+    - cron: "0 12 * * *" # Daily at 12PM UTC
 
 jobs:
   sync:
