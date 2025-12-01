@@ -26,7 +26,9 @@ services:
         start_period: 1m
 
    geoserver:
-      image: kartoza/geoserver:${GS_VERSION}
+      build: .
+      container_name: geoserver
+      image: battleroad/docker-geoserver:${GS_VERSION}
       volumes:
         - geoserver-data:/opt/geoserver/data_dir
         - geoserver-gwc:/opt/geoserver/gwc

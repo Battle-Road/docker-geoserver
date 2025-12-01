@@ -64,6 +64,9 @@ ARG GDAL_LIBS_PATH="/usr/lib/x86_64-linux-gnu"
 ENV DEBIAN_FRONTEND=noninteractive
 ENV OTEL_SERVICE_NAME=geoserver
 
+# Custom gosu version (Security Updates)
+ENV GOSU_VERSION=1.19
+
 #Install extra fonts to use with sld font markers
 RUN set -eux; \
     apt-get update; \
@@ -71,7 +74,9 @@ RUN set -eux; \
         locales gnupg2 ca-certificates software-properties-common  iputils-ping \
         apt-transport-https  fonts-cantarell fonts-liberation lmodern fonts-aenigma \
         ttf-bitstream-vera ttf-sjfonts tv-fonts libapr1-dev libssl-dev git \
-        zip unzip curl xsltproc certbot  cabextract gettext postgresql-client figlet gosu gdal-bin; \
+        zip unzip curl xsltproc certbot  cabextract gettext postgresql-client figlet wget gdal-bin; \
+      wget -O /usr/sbin/gosu "https://github.com/tianon/gosu/releases/download/${GOSU_VERSION}/gosu-$(dpkg --print-architecture)"; \
+      chmod +x /usr/sbin/gosu; \
       dpkg-divert --local --rename --add /sbin/initctl \
       && apt-get clean \
       && rm -rf /var/lib/apt/lists/*; \
@@ -120,11 +125,12 @@ RUN mkdir -p ${OTEL_DIR} \
 COPY --from=geoserver-plugin-downloader /work/required_plugins/*.zip ${REQUIRED_PLUGINS_DIR}/
 COPY --from=geoserver-plugin-downloader /work/required_plugins/*.jar ${REQUIRED_PLUGINS_DIR}/
 COPY --from=geoserver-plugin-downloader /work/required_plugins.txt ${REQUIRED_PLUGINS_DIR}/
-COPY --from=geoserver-plugin-downloader /work/stable_plugins/*.zip ${STABLE_PLUGINS_DIR}/
-COPY --from=geoserver-plugin-downloader /work/community_plugins/*.zip ${COMMUNITY_PLUGINS_DIR}/
 COPY --from=geoserver-plugin-downloader /work/geoserver_war/geoserver.* ${REQUIRED_PLUGINS_DIR}/
-COPY --from=geoserver-plugin-downloader /work/community_plugins.txt ${COMMUNITY_PLUGINS_DIR}/
-COPY --from=geoserver-plugin-downloader /work/stable_plugins.txt ${STABLE_PLUGINS_DIR}/
+# Disable Extra Plugins (Security Updates)
+# COPY --from=geoserver-plugin-downloader /work/stable_plugins/*.zip ${STABLE_PLUGINS_DIR}/
+# COPY --from=geoserver-plugin-downloader /work/community_plugins/*.zip ${COMMUNITY_PLUGINS_DIR}/
+# COPY --from=geoserver-plugin-downloader /work/community_plugins.txt ${COMMUNITY_PLUGINS_DIR}/
+# COPY --from=geoserver-plugin-downloader /work/stable_plugins.txt ${STABLE_PLUGINS_DIR}/
 
 # copy telemetry jars
 COPY --from=geoserver-plugin-downloader /work/telemetry/opentelemetry-javaagent.jar ${OTEL_DIR}/opentelemetry-javaagent.jar
@@ -163,5 +169,8 @@ RUN set -eux \
     && apt-get -y --purge autoremove \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
+
+# Upgrade setuptools (Security Updates)
+RUN pip3 install --upgrade setuptools --break-system-packages
 
 RUN pip3 install -r /lib/utils/requirements.txt --break-system-packages
