@@ -1,22 +1,22 @@
 # Battle Road
-docker pull kartoza/postgis:18-3.6
-docker-compose build
-docker-compose up -d
+- docker pull kartoza/postgis:18-3.6
+- docker-compose build
+- docker-compose up -d
 
 ## Login
-http://localhost:8600/geoserver/web/
-UN: admin
-PW: myawesomegeoserver
+- http://localhost:8600/geoserver/web/
+    - UN: admin
+    - PW: myawesomegeoserver
 
-## Updates
-docker-compose build --no-cache
-docker-compose up -d
+## Testing updates
+- docker-compose build --no-cache
+- docker-compose up -d
 
 ## Checking newest versions
-https://hub.docker.com/r/kartoza/postgis/
-https://downloads.sourceforge.net/project/geoserver/GeoServer/
-https://github.com/kartoza/docker-geoserver/releases
-
+- https://github.com/kartoza/docker-geoserver/releases
+- https://hub.docker.com/r/kartoza/postgis/
+- https://downloads.sourceforge.net/project/geoserver/GeoServer/
+___
 # Table of Contents
 
 -   [Kartoza docker-geoserver](#kartoza-docker-geoserver)
