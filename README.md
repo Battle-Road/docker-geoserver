@@ -1,4 +1,5 @@
-# Battle Road
+# AtomEngine GeoServer
+
 - docker pull kartoza/postgis:18-3.6
 - docker-compose build
 - docker-compose up -d
